@@ -1,32 +1,33 @@
-name: Build Electron App
+name: Build Electron App (Windows ZIP)
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
-  build:
+  build-windows:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Install dependencies
         run: npm install
 
-      - name: Make ZIP using Electron Forge
+      - name: Build (make zip)
         run: npm run make
 
-      - name: Upload ZIP Artifact
+      - name: Upload ZIP artifact
         uses: actions/upload-artifact@v4
         with:
-          name: zip-electron-app
-          path: out/make/zip/win32/x64/*.zip
+          name: PKUTimeTable-win32-zip
+          path: |
+            out/make/**/zip/*.zip
