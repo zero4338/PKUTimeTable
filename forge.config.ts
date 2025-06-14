@@ -1,27 +1,26 @@
-// forge.config.ts 或 forge.config.js
-import { MakerZIP } from '@electron-forge/maker-zip';
+import path from 'path';
 import { WebpackPlugin } from '@electron-forge/plugin-webpack';
-import type { ForgeConfig } from '@electron-forge/shared-types';
 
-const config: ForgeConfig = {
-  packagerConfig: {
-    icon: './assets/app-icon', // 如果有图标
-  },
+export default {
+  packagerConfig: {},
+  rebuildConfig: {},
   makers: [
-    new MakerZIP(),
+    {
+      name: '@electron-forge/maker-zip',
+    },
   ],
   plugins: [
     new WebpackPlugin({
-      mainConfig: './webpack.main.config.js',
+      mainConfig: path.resolve(__dirname, './webpack.main.config.js'),
       renderer: {
-        config: './webpack.renderer.config.js',
+        config: path.resolve(__dirname, './webpack.renderer.config.js'),
         entryPoints: [
           {
-            html: './src/index.html',
-            js: './src/renderer.ts',
             name: 'main_window',
+            html: path.resolve(__dirname, './src/renderer/index.html'),
+            js: path.resolve(__dirname, './src/renderer/index.tsx'),
             preload: {
-              js: './src/preload.ts',
+              js: path.resolve(__dirname, './src/preload.ts'),
             },
           },
         ],
@@ -29,5 +28,3 @@ const config: ForgeConfig = {
     }),
   ],
 };
-
-export default config;

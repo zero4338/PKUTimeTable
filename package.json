@@ -30,6 +30,8 @@
         "@electron-forge/plugin-fuses": "^7.8.1",
         "@electron-forge/plugin-webpack": "^7.8.1",
         "@electron/fuses": "^1.8.0",
+        "@types/react": "^19.1.8",
+        "@types/react-dom": "^19.1.6",
         "electron": "^36.4.0",
         "ts-loader": "^9.5.2",
         "typescript": "^5.8.3",
@@ -38,7 +40,9 @@
     },
     "dependencies": {
         "electron-squirrel-startup": "^1.0.1",
-        "puppeteer": "^24.10.1"
+        "puppeteer": "^24.10.1",
+        "react": "^19.1.0",
+        "react-dom": "^19.1.0"
     },
     "config": {
         "forge": "forge.config.ts"

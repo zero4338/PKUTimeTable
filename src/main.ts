@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer';
-async function simulateLogin(USERNAME: string, PASSWORD: string) {
+async function doLogin(USERNAME: string, PASSWORD: string): Promise<boolean> {
     const browser = await puppeteer.launch({
         headless: false,
         args: [
@@ -33,59 +33,60 @@ async function simulateLogin(USERNAME: string, PASSWORD: string) {
 
         await page.type('#user_name', USERNAME);
         await page.type('#password', PASSWORD);
+        await page.click('#logon_button');
+        await page.waitForNavigation();
 
-        await Promise.all([
-            page.waitForNavigation({ waitUntil: 'networkidle2' }),
-            page.click('#logon_button'),
-        ]);
 
-        const finalUrl = page.url();
-        if (!finalUrl.includes('course.pku.edu.cn')) {
-        throw new Error('登录失败，未跳转回课程网：' + finalUrl);
-        }
+        const success = page.url().includes('webapps/portal');
 
-        console.log('登录成功，当前页面：', finalUrl);
-
-        const cookies = await page.cookies();
-        const html = await page.content();
-
-        console.log('抓取成功，HTML长度:', html.length);
-
+        await browser.close();
+        return success;
     } catch (err) {
         console.error('登录流程异常:', err);
+        return false;
     }
 }
 
-
-
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
+import { ipcMain } from 'electron';
 
-const createWindow = () => {
-    const win = new BrowserWindow({
+async function createWindow() {
+    mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js'),
+            preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY, // 使用 IPC 需要 preload
+            nodeIntegration: false,
+            contextIsolation: true,
         },
     });
 
-    win.loadFile(path.join(__dirname, 'index.html'));
-};
+    // Webpack plugin 会替换这里的入口路径
+    await mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+
+    // 打开 DevTools（开发时可用）
+    mainWindow.webContents.openDevTools();
+}
 
 app.disableHardwareAcceleration();
 
 let mainWindow: BrowserWindow;
 app.whenReady().then(() => {
-    app.whenReady().then(() => {
-        mainWindow = new BrowserWindow({
-            width: 800,
-            height: 600,
-            webPreferences: {
-            preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-            },
+    app.whenReady().then(async () => {
+        createWindow();
+        ipcMain.on('login-request', async (event, { username, password }) => {
+            console.log(`收到登录请求：${username} / ${password}`);
+            try {
+                const success = await doLogin(username, password);
+                if (success) {
+                event.reply('login-success');
+                } else {
+                event.reply('login-failure', '用户名或密码错误');
+                }
+            } catch (err) {
+                event.reply('login-failure', '登录时出错');
+            }
         });
-
-        mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
     });
 });
