@@ -3,7 +3,14 @@ import { WebpackPlugin } from '@electron-forge/plugin-webpack';
 import { MakerZIP } from '@electron-forge/maker-zip';
 
 export default {
-  packagerConfig: {},
+  packagerConfig: {
+    extraResources: [
+      {
+        from: 'vendor/chrome',
+        to: 'chrome',
+      },
+    ],
+  },
   rebuildConfig: {},
   makers: [
     new MakerZIP({}, ['win32', 'linux']),

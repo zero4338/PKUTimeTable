@@ -1,9 +1,27 @@
+import os from 'os';
+
+function getChromePath(): string {
+  const isDev = !app.isPackaged;
+  const base = isDev
+    ? path.resolve(__dirname, '..', 'vendor', 'chrome')
+    : path.join(process.resourcesPath, 'chrome');
+
+  switch (os.platform()) {
+    case 'win32':
+      return path.join(base, 'chrome-win', 'chrome.exe');
+    case 'darwin':
+      return path.join(base, 'chrome-mac', 'Chromium.app', 'Contents', 'MacOS', 'Chromium');
+    case 'linux':
+      return path.join(base, 'chrome-linux', 'chrome');
+    default:
+      throw new Error('Unsupported platform');
+  }
+}
+
 import puppeteer from 'puppeteer';
 async function getTimeTablePageContent(USERNAME: string, PASSWORD: string){
-    const electronExePath = app.getPath('exe');
-    console.log('Electron exe path:', electronExePath);
     const browser = await puppeteer.launch({
-        executablePath: electronExePath,
+        executablePath: getChromePath(),
         headless: false,
         args: [
             '--disable-gpu',
