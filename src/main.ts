@@ -91,18 +91,19 @@ async function createLoginWindow() {
 app.disableHardwareAcceleration();
 
 let mainWindow: BrowserWindow;
-app.whenReady().then(() => {
-    app.whenReady().then(async () => {
-        await createLoginWindow();
-        await ipcMain.on('login-request', async (event, { username, password }) => {
-            console.log(`收到登录请求：${username} / ${password}`);            
-            try {
-                const content = await getTimeTablePageContent(username, password);
-                const events = parseTimeTablePageContent(content);
-                event.sender.send('calendar-events', events);
-            } catch (err) {
-                event.reply('login-failure', '登录时出错');
-            }
-        });
+app.whenReady().then(async () => {
+    await createLoginWindow();
+    ipcMain.on('login-request', async (event, { username, password }) => {
+        console.log(`收到登录请求：${username} / ${password}`);            
+        try {
+            const content = await getTimeTablePageContent(username, password);
+            console.log('[Main] got content');
+            const events = parseTimeTablePageContent(content);
+            console.log('[Main] parsed events:', events);
+            event.sender.send('calendar-events', events);
+        } catch (err) {
+            console.error('[Main] login failed:', err);
+            event.reply('login-failure', '登录时出错');
+        }
     });
 });

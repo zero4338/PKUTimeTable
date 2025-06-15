@@ -14,6 +14,7 @@ export const Login = () => {
     const [password, setPassword] = useState('');
 
     const handleLogin = () => {
+        console.log('[Renderer] login clicked', username, password);
         window.api.sendLogin(username, password);
     };
 
