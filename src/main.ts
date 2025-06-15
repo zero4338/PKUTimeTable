@@ -5,7 +5,6 @@ function findChromeExecutable(): string | null {
   const platform = os.platform();
 
   if (platform === 'win32') {
-    // Windows 常见 Chrome 安装路径
     const suffixes = [
       'Google\\Chrome\\Application\\chrome.exe',
       'Chromium\\Application\\chrome.exe',
@@ -25,7 +24,6 @@ function findChromeExecutable(): string | null {
       }
     }
   } else if (platform === 'darwin') {
-    // macOS 常见路径
     const candidates = [
       '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
       path.join(os.homedir(), 'Applications/Google Chrome.app/Contents/MacOS/Google Chrome'),
@@ -36,7 +34,6 @@ function findChromeExecutable(): string | null {
       }
     }
   } else if (platform === 'linux') {
-    // Linux 常见命令
     const candidates = [
       '/usr/bin/google-chrome',
       '/usr/bin/google-chrome-stable',
@@ -57,7 +54,7 @@ import puppeteer from 'puppeteer';
 async function getTimeTablePageContent(USERNAME: string, PASSWORD: string){
     const browser = await puppeteer.launch({
         executablePath: findChromeExecutable() || puppeteer.executablePath(),
-        headless: false,
+        headless: true,
         args: [
             '--disable-gpu',
             '--disable-dev-shm-usage',
@@ -141,7 +138,7 @@ async function createLoginWindow() {
 
     await mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 }
 
 console.log('[Main] main.ts started'); // 一开始就输出
