@@ -1,6 +1,7 @@
 declare global {
     interface Window {
         api: {
+            onCalendarEvents(arg0: (evts: any) => void): unknown;
             sendLogin: (username: string, password: string) => void;
         };
     }

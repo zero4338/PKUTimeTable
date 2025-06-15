@@ -39,6 +39,9 @@
         "webpack-cli": "^6.0.1"
     },
     "dependencies": {
+        "@fullcalendar/core": "^6.1.17",
+        "@fullcalendar/daygrid": "^6.1.17",
+        "@fullcalendar/react": "^6.1.17",
         "electron-squirrel-startup": "^1.0.1",
         "puppeteer": "^24.10.1",
         "react": "^19.1.0",

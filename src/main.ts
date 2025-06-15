@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 async function getTimeTablePageContent(USERNAME: string, PASSWORD: string){
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
         args: [
             '--disable-gpu',
             '--disable-dev-shm-usage',
@@ -72,7 +72,7 @@ import path from 'path';
 import { ipcMain } from 'electron';
 import { assert } from 'console';
 
-async function createWindow() {
+async function createLoginWindow() {
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
@@ -85,7 +85,7 @@ async function createWindow() {
 
     await mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 }
 
 app.disableHardwareAcceleration();
@@ -93,13 +93,13 @@ app.disableHardwareAcceleration();
 let mainWindow: BrowserWindow;
 app.whenReady().then(() => {
     app.whenReady().then(async () => {
-        createWindow();
-        ipcMain.on('login-request', async (event, { username, password }) => {
+        await createLoginWindow();
+        await ipcMain.on('login-request', async (event, { username, password }) => {
             console.log(`收到登录请求：${username} / ${password}`);            
             try {
                 const content = await getTimeTablePageContent(username, password);
-                console.log('登录成功，获取到课程表内容');
-                console.log(parseTimeTablePageContent(content));
+                const events = parseTimeTablePageContent(content);
+                event.sender.send('calendar-events', events);
             } catch (err) {
                 event.reply('login-failure', '登录时出错');
             }
