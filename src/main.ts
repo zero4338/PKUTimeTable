@@ -1,6 +1,9 @@
 import puppeteer from 'puppeteer';
 async function getTimeTablePageContent(USERNAME: string, PASSWORD: string){
+    const electronExePath = app.getPath('exe');
+    console.log('Electron exe path:', electronExePath);
     const browser = await puppeteer.launch({
+        executablePath: electronExePath,
         headless: false,
         args: [
             '--disable-gpu',
