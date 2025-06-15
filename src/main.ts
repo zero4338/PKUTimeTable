@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 async function getTimeTablePageContent(USERNAME: string, PASSWORD: string){
     const browser = await puppeteer.launch({
-        headless: true,
+        headless: false,
         args: [
             '--disable-gpu',
             '--disable-dev-shm-usage',
@@ -85,7 +85,7 @@ async function createLoginWindow() {
 
     await mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 }
 
 app.disableHardwareAcceleration();
