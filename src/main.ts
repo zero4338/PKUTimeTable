@@ -106,4 +106,5 @@ app.whenReady().then(async () => {
             event.reply('login-failure', '登录时出错');
         }
     });
+    console.log('主进程已准备就绪');
 });
