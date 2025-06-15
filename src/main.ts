@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer';
-async function doLogin(USERNAME: string, PASSWORD: string): Promise<boolean> {
+async function getTimeTablePageContent(USERNAME: string, PASSWORD: string){
     const browser = await puppeteer.launch({
         headless: false,
         args: [
@@ -12,9 +12,7 @@ async function doLogin(USERNAME: string, PASSWORD: string): Promise<boolean> {
     });
     const page = await browser.newPage();
 
-    await page.setUserAgent(
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36'
-    );
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36');
 
     try {
         await page.goto('https://course.pku.edu.cn/webapps/bb-sso-BBLEARN/login.html', {
@@ -34,22 +32,45 @@ async function doLogin(USERNAME: string, PASSWORD: string): Promise<boolean> {
         await page.type('#user_name', USERNAME);
         await page.type('#password', PASSWORD);
         await page.click('#logon_button');
-        await page.waitForNavigation();
+        await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 60000 });
+        if (!page.url().includes('webapps/portal')) {
+            throw new Error('登录失败，当前URL: ' + page.url());
+        }
 
-
-        const success = page.url().includes('webapps/portal');
+        await page.goto('https://course.pku.edu.cn/webapps/calendar/viewPersonal', {waitUntil: 'networkidle2',});
+        const content = await page.content();
 
         await browser.close();
-        return success;
+        return content;
     } catch (err) {
-        console.error('登录流程异常:', err);
-        return false;
+        throw new Error('登录失败');
     }
+}
+
+interface CalendarEvent {
+  date: string;     // e.g. Wednesday, June 04, 2025
+  time: string;     // e.g. 12:00p
+  title: string;    // e.g. 第十二次作业
+}
+
+function parseTimeTablePageContent(content: string): CalendarEvent[] {
+    const eventRegex = /<div class="fc-event-inner.*?">[\s\S]*?<span class="hideoff">([^<]*)<\/span>\s*<span class="fc-event-time">([^<]*)<\/span>\s*<span class="fc-event-title">([^<]*)<\/span>/g;
+
+    const events: CalendarEvent[] = [];
+
+    let match: RegExpExecArray | null;
+    while ((match = eventRegex.exec(content)) !== null) {
+    const [_, date, time, title] = match;
+        events.push({ date: date.trim(), time: time.trim(), title: title.trim() });
+    }
+
+    return events;
 }
 
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import { ipcMain } from 'electron';
+import { assert } from 'console';
 
 async function createWindow() {
     mainWindow = new BrowserWindow({
@@ -74,14 +95,11 @@ app.whenReady().then(() => {
     app.whenReady().then(async () => {
         createWindow();
         ipcMain.on('login-request', async (event, { username, password }) => {
-            console.log(`收到登录请求：${username} / ${password}`);
+            console.log(`收到登录请求：${username} / ${password}`);            
             try {
-                const success = await doLogin(username, password);
-                if (success) {
-                event.reply('login-success');
-                } else {
-                event.reply('login-failure', '用户名或密码错误');
-                }
+                const content = await getTimeTablePageContent(username, password);
+                console.log('登录成功，获取到课程表内容');
+                console.log(parseTimeTablePageContent(content));
             } catch (err) {
                 event.reply('login-failure', '登录时出错');
             }
