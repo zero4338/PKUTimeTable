@@ -56,16 +56,14 @@ async function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
-            preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY, // 使用 IPC 需要 preload
+            preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
             nodeIntegration: false,
             contextIsolation: true,
         },
     });
 
-    // Webpack plugin 会替换这里的入口路径
     await mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
-    // 打开 DevTools（开发时可用）
     mainWindow.webContents.openDevTools();
 }
 
