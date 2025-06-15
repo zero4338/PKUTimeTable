@@ -1,13 +1,12 @@
 import path from 'path';
 import { WebpackPlugin } from '@electron-forge/plugin-webpack';
+import { MakerZIP } from '@electron-forge/maker-zip';
 
 export default {
   packagerConfig: {},
   rebuildConfig: {},
   makers: [
-    {
-      name: '@electron-forge/maker-zip',
-    },
+    new MakerZIP({}, ['win32', 'linux']),
   ],
   plugins: [
     new WebpackPlugin({
