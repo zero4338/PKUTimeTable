@@ -18,13 +18,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Cache npm
+      - name: Get npm cache dir
+        id: npm-cache-dir
+        run: echo "NPM_CACHE_DIR=$(npm config get cache)" >> $env:GITHUB_ENV
+
+      - name: Cache npm (Windows)
         uses: actions/cache@v4
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
+          path: ${{ env.NPM_CACHE_DIR }}
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-npm-cache-
+            ${{ runner.os }}-npm-
 
       - name: Install dependencies
         run: npm install
