@@ -32,8 +32,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-      - name: Download Chrome
-        run: npm run postinstall
 
       - name: Build (make zip)
         run: npm run make

@@ -1,27 +1,62 @@
 import os from 'os';
+import fs from 'fs';
 
-function getChromePath(): string {
-  const isDev = !app.isPackaged;
-  const base = isDev
-    ? path.resolve(__dirname, '..', 'vendor', 'chrome')
-    : path.join(process.resourcesPath, 'chrome');
+function findChromeExecutable(): string | null {
+  const platform = os.platform();
 
-  switch (os.platform()) {
-    case 'win32':
-      return path.join(base, 'chrome-win', 'chrome.exe');
-    case 'darwin':
-      return path.join(base, 'chrome-mac', 'Chromium.app', 'Contents', 'MacOS', 'Chromium');
-    case 'linux':
-      return path.join(base, 'chrome-linux', 'chrome');
-    default:
-      throw new Error('Unsupported platform');
+  if (platform === 'win32') {
+    // Windows 常见 Chrome 安装路径
+    const suffixes = [
+      'Google\\Chrome\\Application\\chrome.exe',
+      'Chromium\\Application\\chrome.exe',
+    ];
+    const prefixes = [
+      process.env.LOCALAPPDATA,
+      process.env.PROGRAMFILES,
+      process.env['PROGRAMFILES(X86)'],
+    ].filter(Boolean) as string[];
+
+    for (const prefix of prefixes) {
+      for (const suffix of suffixes) {
+        const fullPath = path.join(prefix, suffix);
+        if (fs.existsSync(fullPath)) {
+          return fullPath;
+        }
+      }
+    }
+  } else if (platform === 'darwin') {
+    // macOS 常见路径
+    const candidates = [
+      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      path.join(os.homedir(), 'Applications/Google Chrome.app/Contents/MacOS/Google Chrome'),
+    ];
+    for (const candidate of candidates) {
+      if (fs.existsSync(candidate)) {
+        return candidate;
+      }
+    }
+  } else if (platform === 'linux') {
+    // Linux 常见命令
+    const candidates = [
+      '/usr/bin/google-chrome',
+      '/usr/bin/google-chrome-stable',
+      '/usr/bin/chromium-browser',
+      '/usr/bin/chromium',
+    ];
+    for (const candidate of candidates) {
+      if (fs.existsSync(candidate)) {
+        return candidate;
+      }
+    }
   }
+  return null;
 }
+
 
 import puppeteer from 'puppeteer';
 async function getTimeTablePageContent(USERNAME: string, PASSWORD: string){
     const browser = await puppeteer.launch({
-        executablePath: getChromePath(),
+        executablePath: findChromeExecutable() || puppeteer.executablePath(),
         headless: false,
         args: [
             '--disable-gpu',
