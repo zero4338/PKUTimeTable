@@ -30,4 +30,4 @@ jobs:
         with:
           name: PKUTimeTable-win32-zip
           path: |
-            out/make/**/zip/*.zip
+            out/make/*.zip
