@@ -88,8 +88,8 @@ async function createLoginWindow() {
     mainWindow.webContents.openDevTools();
 }
 
+console.log('[Main] main.ts started'); // 一开始就输出
 app.disableHardwareAcceleration();
-
 let mainWindow: BrowserWindow;
 app.whenReady().then(async () => {
     await createLoginWindow();
