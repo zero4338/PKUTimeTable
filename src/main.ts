@@ -73,7 +73,7 @@ async function getTimeTablePageContent(USERNAME: string, PASSWORD: string){
         timeout: 60000,
         });
 
-        await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 60000 });
+        await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 6000 });
 
         const url = page.url();
         if (!url.includes('iaaa.pku.edu.cn')) {
@@ -85,7 +85,7 @@ async function getTimeTablePageContent(USERNAME: string, PASSWORD: string){
         await page.type('#user_name', USERNAME);
         await page.type('#password', PASSWORD);
         await page.click('#logon_button');
-        await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 60000 });
+        await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 6000 });
         if (!page.url().includes('webapps/portal')) {
             throw new Error('登录失败，当前URL: ' + page.url());
         }
@@ -96,6 +96,7 @@ async function getTimeTablePageContent(USERNAME: string, PASSWORD: string){
         await browser.close();
         return content;
     } catch (err) {
+
         throw new Error('登录失败');
     }
 }

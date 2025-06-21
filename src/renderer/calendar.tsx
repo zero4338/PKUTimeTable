@@ -3,6 +3,7 @@ import { Calendar } from '@fullcalendar/core';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import React from 'react';
+import './calendar.css'; // 引入自定义样式
 
 export interface CalendarEvent {
   date: string;
@@ -44,11 +45,18 @@ function parseToFullCalendarEvent(raw: CalendarEvent) {
 
 export const CalendarView: React.FC<Props> = ({ events }) => {
   return (
-    <FullCalendar
-      plugins={[dayGridPlugin]}
-      initialView="dayGridMonth"
-      events={events.map(parseToFullCalendarEvent)}
-      height="auto"
-    />
+    <div id="calendar-wrapper">
+      <FullCalendar
+        plugins={[dayGridPlugin]}
+        initialView="dayGridMonth"
+        events={events.map(parseToFullCalendarEvent)}
+        height="auto"
+        headerToolbar={{
+          left: 'prev,next today',
+          center: 'title',
+          right: '', // 简洁视图，去掉 week/day 切换
+        }}
+      />
+    </div>
   );
 };

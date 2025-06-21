@@ -1,0 +1,39 @@
+/* calendar.css */
+#calendar-wrapper {
+  padding: 30px;
+  background-color: #f7f9fc;
+  min-height: 100vh;
+}
+
+.fc {
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.fc-toolbar-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.fc-daygrid-event {
+  background-color: #007bff !important;
+  color: white !important;
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-size: 0.85rem;
+}
+
+.fc-button {
+  background-color: #007bff !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 5px 10px !important;
+}
+
+.fc-button-primary:not(:disabled):active,
+.fc-button-primary:not(:disabled).fc-button-active {
+  background-color: #0056b3 !important;
+}

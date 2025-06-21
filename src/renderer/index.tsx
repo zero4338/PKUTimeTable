@@ -3,7 +3,8 @@ declare global {
         api: {
             onCalendarEvents(arg0: (evts: any) => void): unknown;
             sendLogin: (username: string, password: string) => void;
-        };
+            onLoginFailure: (callback: (msg: string) => void) => void;
+          };
     }
 }
 
